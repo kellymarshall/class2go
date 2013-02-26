@@ -12,7 +12,7 @@ courses" (MOOC's): [Computer Networking][net] and
   [net]: http://networking.class.stanford.edu/
   [sol]: http://solar.class.stanford.edu/
 
-Class2Go was built to be an open platform for learning and research.
+Class2Go is meant to be an open platform for learning and research.
 Professors have access to the classes' data to learn how their
 students learn. We will facilitate experiments.  For example, we
 intend this to be the best plaform for running A/B/N tests to measure
