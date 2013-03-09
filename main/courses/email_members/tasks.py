@@ -14,6 +14,7 @@ from smtplib import SMTPException, SMTPServerDisconnected, SMTPDataError, SMTPCo
 from celery.task import current
 from django.contrib.sites.models import Site
 
+import string
 import random
 import math
 import time
@@ -51,10 +52,10 @@ def delegate_list_emails(hash_for_msg):
 
 @task(default_retry_delay=15, max_retries=5)
 def email_list(msg_hash, addr_list, throttle=False):
-    '''Sends ListEmail identifed by msg_hash to all recipients in addr_list
-       Sends multipart
-    '''
-    
+    """
+    Sends ListEmail identifed by msg_hash to all recipients in addr_list
+    Sends multipart
+    """
     email_from_db=ListEmail.objects.get(hash=msg_hash)
     if (not email_from_db.from_name) or (not email_from_db.from_addr):
         return 0
@@ -76,10 +77,16 @@ def email_list(msg_hash, addr_list, throttle=False):
                 logger.info('Email with hash ' + msg_hash + ' NOT sent b/c OPTOUT ' + email)
 
             else:
+                split_name = name.split(' ')
                 html_msg = render_to_string('email/email_marketing.html',
                             {'message':email_from_db.html_message,
                              'optout_code':code,
-                             'domain':site.domain
+                             'domain':site.domain,
+                             'name':name,
+                             'first_name':split_name[0],
+                             'last_name':string.join(split_name[1:], ' '),
+                             'email':email,
+                             'unique_id':hash(email),
                             })
                 p = Popen(['lynx','-stdin','-display_charset=UTF-8','-assume_charset=UTF-8','-dump'], stdin=PIPE, stdout=PIPE)
                 (plaintext, err_from_stderr) = p.communicate(input=html_msg.encode('utf-8')) #use lynx to get plaintext
@@ -132,11 +139,12 @@ def email_list(msg_hash, addr_list, throttle=False):
 
 @task()
 def delegate_emails(hash_for_msg, total_num_emails, course_title, course_handle, course_url, query ):
-    '''Delegates emails by spinning up appropriate number of sender workers
-       Tries to minimize DB accesses performed by each worker.
-       Especially passing query forming a queryset, which is ok practice according
-       to https://docs.djangoproject.com/en/dev/ref/models/querysets/#pickling-querysets
-    '''
+    """
+    Delegates emails by spinning up appropriate number of sender workers
+    Tries to minimize DB accesses performed by each worker.
+    Especially passing query forming a queryset, which is ok practice according
+    to https://docs.djangoproject.com/en/dev/ref/models/querysets/#pickling-querysets
+    """
     num_workers=int(math.ceil(float(total_num_emails)/float(EMAILS_PER_WORKER)))
     recipient_qset = User.objects.all() #put recipients in a QuerySet
     recipient_qset.query = query #again, this is supported practice for reconstructing a queryset from a pickle,
@@ -156,13 +164,13 @@ def delegate_emails(hash_for_msg, total_num_emails, course_title, course_handle,
 @task(default_retry_delay=15, max_retries=5)
 def course_email_with_celery(hash_for_msg, to_list,  throttle=False, course_title='', course_handle='', course_url=''):
     """
-        Takes a subject and an html formatted email and sends it from sender to all addresses
-        in the to_list, with each recipient being the only "to".  Emails are sent multipart, in both
-        plain text and html.  Send using celery task.
-        
-        For work division, this task can be called with num_workers and worker_id, where num_workers is the
-        total number of workers and worker_id is the id of this worker, 
-        out of a set with ids 0 to num_workers-1, in homage to the fact that python lists are zero based.
+    Takes a subject and an html formatted email and sends it from sender to all addresses
+    in the to_list, with each recipient being the only "to".  Emails are sent multipart, in both
+    plain text and html.  Send using celery task.
+    
+    For work division, this task can be called with num_workers and worker_id, where num_workers is the
+    total number of workers and worker_id is the id of this worker, 
+    out of a set with ids 0 to num_workers-1, in homage to the fact that python lists are zero based.
     """
     msg = CourseEmail.objects.get(hash=hash_for_msg)
     
