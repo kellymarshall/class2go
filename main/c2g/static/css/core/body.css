@@ -66,6 +66,14 @@ a:hover {color:#820000;}
     display:block;
 }
 
+.well.jobdesc {
+    margin-right: 0;
+    margin-left: 0;
+}
+.well.jobdesc h1.title {
+    margin-bottom: 10px;
+}
+
 .upcoming {
   padding:10px 0px;
   background:#e9e6df;
