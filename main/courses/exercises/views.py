@@ -61,8 +61,8 @@ def save(request, course_prefix, course_suffix, filename):
        newfile.seek(0)
        newfile.write(request.POST['content'].encode('utf-8'))
        newfile.truncate()
-       newfile.close()
        exercise.file.save(filename, newfile)
+       newfile.close()
     except BaseException as e:
         #yes, we're catching all exceptions, but this is for the purpose of sending back an understandable
         #ajax error message.  We'll log the exception which causes email to be sent
