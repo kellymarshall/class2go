@@ -1,6 +1,29 @@
 {% load i18n %}
 
-<div class="container-fluid">
+<div class="well tight" style="overflow:hidden;">
+    <div class="pull-left">
+    <input type="button" value="{% trans 'New section' %}" onclick="$('#new_section_form').toggle();" class="btn" style="margin-left: 20px;" />
+    <a class="btn" style="margin-left: 5px;" href="{% url 'courses.content_sections.views.reorder' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Re-order Sections' %}</a>
+    <a class="btn btn-primary" style="margin-left: 30px;" href="{% url 'courses.videos.views.upload' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'New Video' %}</a>
+    <a class="btn btn-primary" style="margin-left: 5px;" href="{% url 'courses.exams.views.create_exam' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'New ProblemSet / Exam / Survey' %}</a>
+    <a class="btn btn-primary" style="margin-left: 5px;" href="{% url 'courses.additional_pages.views.add_section_page' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'New Static Page' %}</a>
+    <a class="btn btn-primary" style="margin-left: 5px;" href="{% url 'courses.files.views.upload' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'New File' %}</a>
+    </div>
+    <div class="pull-right" id="new_section_form" style="display:none;padding-right:15px;">
+        <form action="{% url 'courses.actions.add_section' %}" method="POST" class="form-inline" style="margin-bottom:0;">
+            <div class="control-group" style="margin:0;">
+                <label class="control-label">{% trans 'Title for new section' %}</label>
+                <input name="title" id="title" type="text" />
+                <input type="submit" value="{% trans 'Create' %}" class="btn" />
+                <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+                <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+            </div>
+            {% csrf_token %}
+        </form>
+    </div>
+</div>
+
+<div class="well container-fluid">
     <a href="javascript:selectAll()">{% trans 'Select all' %}</a> / <a href="javascript:unselectAll()">{% trans 'Unselect all' %}</a>
     <div class="pull-right" style="width:700px;margin-left: 20px;">
         <form name="commit_form" action="{% url 'courses.actions.commit' %}" method="POST">
@@ -98,28 +121,6 @@ function getCheckedIds() {
     return id_str;
 }
 </script>
-<div class="well tight" style="overflow:hidden;">
-    <div class="pull-left">
-    <input type="button" value="{% trans 'New section' %}" onclick="$('#new_section_form').toggle();" class="btn" style="margin-left: 20px;" />
-    <a class="btn" style="margin-left: 5px;" href="{% url 'courses.content_sections.views.reorder' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Re-order Sections' %}</a>
-    <a class="btn btn-primary" style="margin-left: 30px;" href="{% url 'courses.videos.views.upload' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'New Video' %}</a>
-    <a class="btn btn-primary" style="margin-left: 5px;" href="{% url 'courses.exams.views.create_exam' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'New ProblemSet / Exam / Survey' %}</a>
-    <a class="btn btn-primary" style="margin-left: 5px;" href="{% url 'courses.additional_pages.views.add_section_page' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'New Static Page' %}</a>
-    <a class="btn btn-primary" style="margin-left: 5px;" href="{% url 'courses.files.views.upload' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'New File' %}</a>
-    </div>
-    <div class="pull-right" id="new_section_form" style="display:none;padding-right:15px;">
-        <form action="{% url 'courses.actions.add_section' %}" method="POST" class="form-inline" style="margin-bottom:0;">
-            <div class="control-group" style="margin:0;">
-                <label class="control-label">{% trans 'Title for new section' %}</label>
-                <input name="title" id="title" type="text" />
-                <input type="submit" value="{% trans 'Create' %}" class="btn" />
-                <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
-                <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
-            </div>
-            {% csrf_token %}
-        </form>
-    </div>
-</div>
 
 {% include "videos/draft/delete_video_form.html" %}
 {% include "problemsets/draft/delete_problem_set_form.html" %}
