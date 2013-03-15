@@ -8,13 +8,35 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
+    <div class="well tight preload" style="overflow:hidden;">
+        <div class="pull-left">
+            <input type="button" value="{% trans 'New section' %}" onclick="$('#new_section_form').toggle();" class="btn pull-left" style="margin-left: 20px;" />
+            <form id="new_section_form" action="{% url 'courses.actions.add_section' %}" method="POST" class="form-inline pull-left" style="display:none; padding-left:10px; margin: 0;">
+                <div class="control-group" style="margin:0;">
+                    <input name="title" id="title" type="text" title="{% trans 'Title for new section' %}" placeholder="{% trans 'Title for new section' %}" />
+                    <input type="submit" value="{% trans 'Create' %}" class="btn" />
+                    <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+                    <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+                </div>
+                {% csrf_token %}
+            </form>
+        </div>
+        <div class="pull-right">
+            <a class="btn btn-primary" style="margin-right: 5px;" href="{% url 'courses.videos.views.upload' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'New Video' %}</a>
+            <a class="btn btn-primary" style="margin-right: 5px;" href="{% url 'courses.exams.views.create_exam' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'New ProblemSet / Exam / Survey' %}</a>
+            <a class="btn btn-primary" style="margin-right: 5px;" href="{% url 'courses.additional_pages.views.add_section_page' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'New Static Page' %}</a>
+            <a class="btn btn-primary" style="margin-right: 20px;" href="{% url 'courses.files.views.upload' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'New File' %}</a>
+        </div>
+    </div>
+    
     {% include "draft/item_checkbox_functions.html" %}
     {% include "courses/draft/course_content_management_section.html" %}
     
+    
     {% for section_structure in section_structures %}
-    <div class="well">
-        {% include "content_sections/draft/section.html" %}
-    </div>
+        <div class="well postload">
+            {% include "content_sections/draft/section.html" %}
+        </div>
     {% empty %}
         <p style='margin: 20px;'>{% trans 'No content to display.' %}</p>
     {% endfor %}
