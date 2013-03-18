@@ -37,25 +37,32 @@ execute "/usr/bin/killall epmd" do
     action :run
     returns [0, 1]
 end
-execute "/bin/rm -rf /var/lib/ejabberd/*" do
+execute "/bin/rm -r /var/lib/ejabberd/* /var/lib/ejabberd/.erlang.cookie" do
     user "root"
     action :run
     returns [0, 1]
 end
 
 # Configure ejabberd with our preferred settings
-directory "/etc/ejabberd" do
-    owner "root"
-    group "ejabberd"
-    mode 00750
-    action :create
-end
+#directory "/etc/ejabberd" do
+#    owner "root"
+#    group "ejabberd"
+#    mode 00750
+#    action :create
+#end
 
-directory "/etc/default" do
-    owner 'root'
-    group 'root'
-    mode '0755'
-    action :create
+#directory "/etc/default" do
+#    owner 'root'
+#    group 'root'
+#    mode '0755'
+#    action :create
+#end
+
+template "/var/lib/ejabberd/.erlang.cookie" do
+    source "var-lib-ejabberd-dot-erlang-cookie.erb"
+    owner 'ejabberd'
+    group 'ejabberd'
+    mode '0400'
 end
 
 template "/etc/default/ejabberd" do
